@@ -1,0 +1,223 @@
+#!/bin/bash
+
+# Version de l'application : V2.0.0 
+# Nom de l'application : AutoDebianPackage 
+# Description : Simplifier la création de fichier DEB pour vos projet Shell et autre... 
+# Auteur : Médéric Bellemare 
+# Repertoir de creation :/home/mederic/Cloud/AutoDebianPackage 
+# Date :Thu Jul 31 13:59:30 EDT 2014
+# Developer sous :Linux mederic-Laptop 3.13.0-32-generic #57-Ubuntu SMP Tue Jul 15 03:51:12 UTC 2014 i686 i686 i686 GNU/Linux
+
+#Changement du titre du terminal pour le logiciel present
+	
+#-----------DEBUT DES Constante-----------
+debugswitch=false
+version="2.0.1.1"
+#------------FIN DES Constante------------
+#-----------DEBUT DES FUNCTIONS-----------
+logo(){
+	echo " ======$version==============================="
+	echo "         __               __           __     "
+	echo "        / /\             /\ \         /\ \    "  
+	echo "       / /  \           /  \ \____   /  \ \   "
+	echo "      / / /\ \         / /\ \_____\ / /\ \ \  "
+	echo "     / / /\ \ \       / / /\/___  // / /\ \_\ "
+	echo "    / / /  \ \ \     / / /   / / // / /_/ / / "
+	echo "   / / /___/ /\ \   / / /   / / // / /__\/ /  "
+	echo "  / / /_____/ /\ \ / / /   / / // / /_____/   "
+	echo " / /_________/\ \ \\ \ \__/ / // / /          "
+	echo "/ / /_       __\ \_\\ \___\/ // / /           "
+	echo "\_\___\     /____/_/ \/_____/ \/_/				 "
+	echo " ADP / AutomatiqueDebianPackage"
+	echo "============================================="
+	debug 1 "Affichage du logo RÉUSSI"
+}
+
+debug(){
+	if [ $debugswitch = true ]; then
+	case $1 in
+		1 ) echo -e "\e[2;32m$2\e[0;0m" ;;
+		2 ) echo -e "\e[1;33m$2\e[0;0m" ;;
+		3 ) echo -e "\e[2;31m$2\e[0;0m" ;;
+		* ) echo -e "\e[3;33mDEV:\e[3;31mvous devez donner une valeur a debug quand vous lapeller \n Example debug 1 'erreur sintaxe'\e[0;0m" ;;
+	esac
+	sleep 1
+	fi
+}
+
+pause(){
+	debug 1 "Appelle une pause"
+	format newline
+	read -p "Appuyer sur entrer pour continuer"
+	clear
+}
+
+infodeb(){
+	clear
+	debug 1 "USER lit les information sur le script"
+	echo "___________________________________________________________"
+	echo "| Que fais le script présent ?!                           |"
+	echo "| Il vous suis durent la création de votre Packet         |"
+	echo "| Debian. Pas a pas il vous aidera a configurer les       |"
+	echo "| fichier de base pour la création de votre .DEB.         |"
+	echo "| Il est sur que vue la grandeur du systeme de compression|"
+	echo "| le scripte ne peut pas vous offire toute les option     |"
+	echo "| dans les moindre details. Il est donc conseiller        |"
+	echo "| d'apprendre d'avantage sur les DEB sur un site ou forum |"
+	echo "| prévue a cette effet.                                   |"
+	echo "|                                                         |"
+	echo "| En esperent que ce script vous aide un peut !           |"
+	echo "| Médéric Bellemare                                       |"
+	echo "-----------------------------------------------------------"
+	pause
+	menu
+}
+
+depend(){
+	debug 1 "Vérification des packet nésessaire au functionnement de l'application"	
+
+	DEPS="dh-make debhelper packaging-tutorial tree"
+	for i in $DEPS ; do
+    dpkg-query -W -f='${Package}\n' | grep ^$i$ > /dev/null
+    if [ $? != 0 ] ; then
+      echo "$i --> FAIL"
+      	read -p "Voulez vous installer ($i) ou quitter le script (y/n) :" choix
+      	if [ $choix = "y" ]; then
+      		echo "Installation du packet ($i) en cour..."
+      		sudo apt-get install $i -y > /dev/null
+      		else
+      		exit  
+      	fi
+     		else
+     		echo "$i --> OK"
+    	fi
+	done  
+}
+
+pdfview(){
+	debug 1 "Ouverture du fichier $1"
+	nautilus $1
+	menu
+}
+
+format(){
+	case $1 in
+		paragraphe ) echo -e "\n\n\n";;
+		newline ) echo -e "\n";;
+		ligne= ) echo -e "================================================";;
+		ligne* ) echo -e "************************************************";;
+		ligne- ) echo -e "------------------------------------------------";;
+	esac	
+
+}
+
+
+makedeb(){
+	clear
+	debug 1 "Début de la creation du fichier DEB"
+	format "ligne="
+	format "ligne*"
+	echo "Début de creation de votre packet debian!"
+	format "ligne*"
+	format "ligne="
+	format newline
+	echo -e "Vous devez etre dans le dossier ou vous désiré crée votre packet \navant d'executer le script de création"
+	read -p "($PWD) est t'il le bon dossier?(y/n)" choix
+	if [ $choix = "n" ]; then exit; fi
+	debug 1 "Debut des question sur l'application de l'utilisateur"
+	read -p "Quelle est le nom de votre programme?" progname
+	read -p "Quelle est le principale but de votre scripte:" longdesc
+	read -p "En résumé quelle son c'est princpale function:" tinydesc
+	read -p "Quelle est la version de votre programme(ex: 0.1)" progvers
+	read -p "Quelle est votre adresse courielle programmeur:" progemail
+	nomdossier=$progname"-"$progvers
+	debug 2 "Création du dossier d'application"
+	mkdir $nomdossier
+	debug 2 "Deplacement de dossier courent vers $nomdossier"
+	sleep 1
+	cd $nomdossier
+	nautilus "$PWD"
+	clear
+	echo "Deplacé vos scripte dans le dossier qui souvrira"
+	echo "par la suite vous pouvez fermer cette fenêtre"
+	echo "cliquez sur entrer pour continuer"
+	read
+	debug 2 "Creation des fichier et repertoir n'essesaire a la compilation"
+	for f in * ; do
+		if [ "$f" != "debian" ]; then 
+			file=${f// /}
+			mv "$f" "$file"
+		fi
+	done
+	dh_make --createorig -s -e $progemail -y
+	dh_install
+	sleep 10
+	echo 'override_dh_usrlocal:' >> debian/rules
+	cat debian/control | sed -e "s/<insert up to 60 chars description>/$tinydesc"/ > debian/controltemp
+	cat debian/controltemp | sed -e "s/<insert long description, indented with spaces>/$longdesc"/ > debian/controltemp2
+	rm debian/control
+	mv debian/controltemp2 debian/control
+	clear
+	for f in *
+		do
+		if [ "$f" != "debian" ]; then 
+  		echo "Processing $f file..."
+  		echo "$file usr/local/bin" >> debian/install
+  		#FUCKING CRIS DE LAG ICITE A REGARDER LES FICHIER NE CE RENOME PAS TOUT SEUL
+  		debug 3 "DEV: A REGARDER YA DEQUOI QUI PLANTE"
+  		fi
+	done
+	dpkg-buildpackage -r
+	pause
+	cd ..
+	nautilus "$PWD"
+#for f in * ;do file=${f// /?}; echo "$file usr/local/bin" >> debian/install; done
+
+
+}
+
+menu(){
+	clear
+	debug 1 "USER choisi une option menu"
+	logo
+	echo "============================================="
+	echo "|  1.Crée un fichier DEB                     |"
+	echo "|  2.Information sur le script               |"
+	echo "|  3.Lire le tutoriel sur les DebianPaclage  |"
+	echo "============================================="
+	read -p "Votre Choix(1,2,3): " choix
+	case $choix in
+		1 ) makedeb;;
+		2 ) infodeb ;;
+		3 ) pdfview "/usr/share/doc/packaging-tutorial/packaging-tutorial.pdf";;
+		* ) debug 2 "Vous devez selectionner un item disponible dans le menu";pause; menu ;;
+	esac
+}
+
+
+
+
+#------------FIN DES FUNCTIONS------------
+# ----------DEBUT DU CODE----------
+debug 1 "Lancement du code en cour"
+clear
+logo
+depend
+menu
+
+
+# ----------FIN DU CODE----------
+# -------------------------------
+# ----------CopyRight------------
+# L'utilisation de ce logiciel est Open-Srouce !
+# Si vous désiré le modifier a votre image vous avez le droit
+# Si vous ete un bon programmeur n'oublier pas de le partager par GITHUB a jak645
+# Car plus la communoter est grand plus les logiciel irron de l'avant et nous allons pouvoir voir Linux prendre le dessus sur windows :P
+#
+# -------------------------------
+# ----------MiseAJour------------
+# V2.0.1 - Écriture du code de base
+#		V2.0.1.1 - Correction des bug condition
+#
+#
+#
