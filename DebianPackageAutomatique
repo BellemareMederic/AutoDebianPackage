@@ -12,7 +12,7 @@
 	
 #-----------DEBUT DES Constante-----------
 debugswitch=false
-version="2.0.1.4"
+version="2.0.2.0"
 #------------FIN DES Constante------------
 #-----------DEBUT DES FUNCTIONS-----------
 logo(){
