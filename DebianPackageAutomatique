@@ -12,7 +12,7 @@
 	
 #-----------DEBUT DES Constante-----------
 debugswitch=false
-version="2.0.1.1"
+version="2.0.1.2"
 #------------FIN DES Constante------------
 #-----------DEBUT DES FUNCTIONS-----------
 logo(){
@@ -86,7 +86,7 @@ depend(){
       		echo "Installation du packet ($i) en cour..."
       		sudo apt-get install $i -y > /dev/null
       		else
-      		exit  
+      		menu  
       	fi
      		else
      		echo "$i --> OK"
@@ -173,7 +173,7 @@ makedeb(){
 	nautilus "$PWD"
 #for f in * ;do file=${f// /?}; echo "$file usr/local/bin" >> debian/install; done
 
-
+name
 }
 
 menu(){
@@ -184,6 +184,7 @@ menu(){
 	echo "|  1.Crée un fichier DEB                     |"
 	echo "|  2.Information sur le script               |"
 	echo "|  3.Lire le tutoriel sur les DebianPaclage  |"
+	echo "|  4.Fermer l'application                    |"
 	echo "============================================="
 	read -p "Votre Choix(1,2,3): " choix
 	case $choix in
