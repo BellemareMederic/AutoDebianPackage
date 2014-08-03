@@ -12,7 +12,7 @@
 	
 #-----------DEBUT DES Constante-----------
 debugswitch=false
-version="2.0.1.2"
+version="2.0.1.4"
 #------------FIN DES Constante------------
 #-----------DEBUT DES FUNCTIONS-----------
 logo(){
@@ -86,7 +86,7 @@ depend(){
       		echo "Installation du packet ($i) en cour..."
       		sudo apt-get install $i -y > /dev/null
       		else
-      		menu  
+      		exit
       	fi
      		else
      		echo "$i --> OK"
@@ -123,14 +123,14 @@ makedeb(){
 	format newline
 	echo -e "Vous devez etre dans le dossier ou vous désiré crée votre packet \navant d'executer le script de création"
 	read -p "($PWD) est t'il le bon dossier?(y/n)" choix
-	if [ $choix = "n" ]; then exit; fi
+	if [ $choix = "n" ]; then menu; fi
 	debug 1 "Debut des question sur l'application de l'utilisateur"
 	read -p "Quelle est le nom de votre programme?" progname
 	read -p "Quelle est le principale but de votre scripte:" longdesc
 	read -p "En résumé quelle son c'est princpale function:" tinydesc
 	read -p "Quelle est la version de votre programme(ex: 0.1)" progvers
 	read -p "Quelle est votre adresse courielle programmeur:" progemail
-	nomdossier=$progname"-"$progvers
+	nomdossier=${progname,,}"-"$progvers
 	debug 2 "Création du dossier d'application"
 	mkdir $nomdossier
 	debug 2 "Deplacement de dossier courent vers $nomdossier"
@@ -142,12 +142,11 @@ makedeb(){
 	echo "par la suite vous pouvez fermer cette fenêtre"
 	echo "cliquez sur entrer pour continuer"
 	read
+	rm *~
 	debug 2 "Creation des fichier et repertoir n'essesaire a la compilation"
 	for f in * ; do
-		if [ "$f" != "debian" ]; then 
-			file=${f// /}
-			mv "$f" "$file"
-		fi
+		file=${f// /}
+		mv "$f" "$file"
 	done
 	dh_make --createorig -s -e $progemail -y
 	dh_install
@@ -163,17 +162,15 @@ makedeb(){
 		if [ "$f" != "debian" ]; then 
   		echo "Processing $f file..."
   		echo "$file usr/local/bin" >> debian/install
-  		#FUCKING CRIS DE LAG ICITE A REGARDER LES FICHIER NE CE RENOME PAS TOUT SEUL
-  		debug 3 "DEV: A REGARDER YA DEQUOI QUI PLANTE"
   		fi
 	done
+	if [ "$1"=="edit" ]; then echo "Il est temps pour vous de modifier les fichier de configuration";pause; fi
 	dpkg-buildpackage -r
 	pause
 	cd ..
 	nautilus "$PWD"
+	clear
 #for f in * ;do file=${f// /?}; echo "$file usr/local/bin" >> debian/install; done
-
-name
 }
 
 menu(){
@@ -182,15 +179,18 @@ menu(){
 	logo
 	echo "============================================="
 	echo "|  1.Crée un fichier DEB                     |"
-	echo "|  2.Information sur le script               |"
-	echo "|  3.Lire le tutoriel sur les DebianPaclage  |"
-	echo "|  4.Fermer l'application                    |"
+	echo "|  2.Crée un fichier DEB Edit Mode           |"
+	echo "|  3.Information sur le script               |"
+	echo "|  4.Lire le tutoriel sur les DebianPaclage  |"
+	echo "|  5.Fermer l'application                    |"
 	echo "============================================="
-	read -p "Votre Choix(1,2,3): " choix
+	read -p "Votre Choix(1,2,3,4,5): " choix
 	case $choix in
 		1 ) makedeb;;
-		2 ) infodeb ;;
-		3 ) pdfview "/usr/share/doc/packaging-tutorial/packaging-tutorial.pdf";;
+        2 ) makedeb edit;;
+		3 ) infodeb ;;
+		4 ) pdfview "/usr/share/doc/packaging-tutorial/packaging-tutorial.pdf";;
+		5 ) clear; exit;;
 		* ) debug 2 "Vous devez selectionner un item disponible dans le menu";pause; menu ;;
 	esac
 }
