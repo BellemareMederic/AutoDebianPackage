@@ -114,7 +114,7 @@ format(){
 
 makedeb(){
 	clear
-	debug 1 "Début de la creation du fichier DEB"
+	debug 1 "Début de la creation du fichier DEB"à
 	format "ligne="
 	format "ligne*"
 	echo "Début de creation de votre packet debian!"
