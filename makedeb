@@ -1,0 +1,115 @@
+#!/bin/bash
+#Nom du script : makedeb
+#Description : Cree automatique un fichier deb facilement.
+#Auteur : Médéric Bellemare
+#Version du script : 3.0
+#Répertoire de ccd réation : /home/mederic/GITHUb/AutoDebianPackage/makedeb
+#Date : Thu Aug  7 17:50:33 EDT 2014
+#Développé sous : Linux mederic-Laptop 3.13.0-32-generic #57-Ubuntu SMP Tue Jul 15 03:51:12 UTC 2014 i686 i686 i686 GNU/Linux
+version="3.0"
+debuginfo=false
+#=-=-=-=-=-=-=-=-=-=Début du code=-=-=-=-=-=-=-=-=-=
+
+language(){
+	debug 1 "Chose language by user"
+	echo "        Chose your language"
+	echo "===================================="
+	echo "| 1.French                         |"
+	echo "| 2.English                        |"
+	echo "|                                  |"
+	echo "|                                  |"
+	echo "|                                  |"
+	echo "===================================="
+	read -p "Your language?(1,2):" lang
+	case $lang in	
+		1 )
+			debug 1 "French Selected" 
+			textdebuginfo="vous devez donner une valeur a debug quand vous lapeller \n Example debug 1 'erreur sintaxe'\e[0;0m" 
+			texttouchpress="Appuyer sur une touche pour continuer"
+			textmenutitle="Menu de l'application"
+			textmenucreedeb="Crée un fichier DEB"
+			textmenuinfo="Information sur le script"
+			textmenuferme="Fermer l'application"
+		;;
+		2 )
+			debug 1 "English Selected"
+		;;
+		* ) clear; debug 2 "Please chose the rihgt language"; language
+		;;
+	esac
+	}
+
+format(){
+	case $1 in
+		paragraphe ) echo -e "\n\n\n";;
+		newline ) echo -e "\n";;
+		ligne= ) echo -e "================================================";;
+		ligne* ) echo -e "************************************************";;
+		ligne- ) echo -e "------------------------------------------------";;
+	esac	
+
+}
+
+debug(){
+	if [ $debuginfo = true ]; then
+	case $1 in
+		1 ) echo -e "\e[2;32mDebug:$2\e[0;0m" ;;
+		2 ) echo -e "\e[1;33mDebug:$2\e[0;0m" ;;
+		3 ) echo -e "\e[2;31mDebug:$2\e[0;0m" ;;
+		* ) echo -e "\e[3;33mDEV:\e[3;31m$textdebuginfo";;
+	esac
+	sleep 1
+	fi
+}
+
+logo(){
+	debug 1 "Show Logo"
+	echo "MakeDeb version $version"
+}
+
+pause(){
+	debug 1 "Wait to key press"
+	format newline
+	read -p "$texttouchpress" -n 1
+	clear
+}
+
+menu(){
+	echo "              $textmenutitle"
+	format ligne=
+	echo "  1.$textmenucreedeb"
+	echo "  2.$textmenuinfo"
+	echo "  3.$textmenuferme"
+	format ligne=
+	read -p "Votre Choix(1,2,3): " choix
+	case $choix in
+		1 ) makedeb;;
+      2 ) infodeb ;;
+		3 ) clear; exit;;
+		* ) debug 2 "Vous devez selectionner un item disponible dans le menu";pause; menu ;;
+	esac
+
+}
+
+logo
+language
+clear
+logo
+menu
+pause	
+#=-=-=-=-=-=-=-=-=-=-Fin du code-=-=-=-=-=-=-=-=-=-=
+#=-=-=-=-=-=-=Droit de copie=-=-=-=-=-=-=
+#
+#
+#
+#
+#=-=-=-=-=-=Mise à jour=-=-=-=-=-=
+# 3.0 - ReWrite all script for language support
+#
+#
+#
+#
+#=-=-=-=-=-=Développeur=-=-=-=-=-=
+# script - Médéric Bellemare
+#
+#
